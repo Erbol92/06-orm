@@ -53,9 +53,8 @@ for _n in range(20):
 session.add_all(querys)
 session.commit()
 
-val = input('введите имя издателя или id')
+val = input('введите имя издателя или id: ')
 if val:
-    print(val.isdigit())
     if not val.isdigit():
         subq = session.query(Book).join(Publisher).filter(
             Publisher.name == val).subquery()
