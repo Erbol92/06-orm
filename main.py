@@ -8,6 +8,7 @@ import json
 
 DSN = "postgresql://postgres:postgres@localhost:5432/orm_db_hw"
 engine = sq.create_engine(DSN)
+drop_tables(engine)
 create_tables(engine)
 
 # сессия
@@ -54,16 +55,17 @@ session.commit()
 
 val = input('введите имя издателя или id')
 if val:
+    print(val.isdigit())
     if not val.isdigit():
         subq = session.query(Book).join(Publisher).filter(
             Publisher.name == val).subquery()
     else:
         subq = session.query(Book).join(Publisher).filter(
-            Publisher.id == val).subquery()
-    print('название книги | название магазина | стоимость покупки | дата покупки')
+            Publisher.id == int(val)).subquery()
+    print(f'{"название книги":<30}  {"название магазина":<19}  {
+          "стоимость покупки":<10}  {"дата покупки":<10}')
     for sale, stock in session.query(Sale, Stock).join(Stock, Sale.id_stock == Stock.id).join(subq, Stock.id_book == subq.c.id).all():
-        print(f'{stock.book.title}|{stock.shop} |{
-            sale.price}|{sale.date_sale.date()}')
+        print(f'{stock.book.title:<30}{stock.shop.name:<19}  { sale.price:<10}  {str(sale.date_sale.date()):<10}')
 
 val = input('переходим в 4му заданию? Y/N:').upper()
 if val == 'Y':
